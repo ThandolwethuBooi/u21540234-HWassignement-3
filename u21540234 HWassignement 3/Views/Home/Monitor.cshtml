@@ -1,0 +1,278 @@
+﻿@model u21540234_HWassignement_3.Models.monitorviewmodel
+@{
+	ViewBag.Title = "Monitor";
+}
+@using PagedList
+@using PagedList.Mvc
+
+
+<body class="bg-dark text-light">
+<div class="container">
+	<div>
+		<h2>Authors</h2>
+
+		<p>
+			<button class="btn btn-secondary" id="createButton" data-url="@Url.Action("Create", "authors")">Add New Authors</button>
+
+		</p>
+		<table class="table table-dark table-striped table table-dark table-striped table-bordered border-dark">
+			<thead>
+				<tr>
+					<th>
+						Name
+					</th>
+					<th>
+						Surname
+					</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var authors in Model.authors)
+				{
+					<tr>
+						<td>
+							@authors.name
+						</td>
+						<td>
+							@authors.surname
+						</td>
+						<td>
+							<button class="btn btn-secondary btn-edit" data-url="@Url.Action("Edit", "authors", new { id = authors.authorId })">EDIT</button>
+							<button class="btn btn-secondary btn-detail" data-url="@Url.Action("Details", "authors", new { id = authors.authorId })">DETAIL</button>
+							<button class="btn btn-secondary btn-delete" data-url="@Url.Action("Delete", "authors", new { id = authors.authorId })">DELETE</button>
+						</td>
+					</tr>
+				}
+
+			</tbody>
+
+
+		</table>
+		@Html.PagedListPager(Model.authors,
+	page => Url.Action("Monitor",
+	new
+	{
+		pageAuthors = page,
+		pageTypes = Request.QueryString["pageTypes"],
+		pageBorrows = Request.QueryString["pageBorrows"]
+
+
+	}),
+	new PagedListRenderOptions
+	{
+		UlElementClasses = new[] { "pagination" },
+		LiElementClasses = new[] { "page-item", "mx-4" },
+		
+
+		LinkToPreviousPageFormat = "Previous",
+		LinkToNextPageFormat = "Next",
+		LinkToFirstPageFormat = "First",
+		LinkToLastPageFormat = "Last",
+		DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+		DisplayLinkToLastPage = PagedListDisplayMode.Always,
+		DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+		DisplayLinkToNextPage = PagedListDisplayMode.Always,
+		Display = PagedListDisplayMode.IfNeeded,
+
+		DisplayEllipsesWhenNotShowingAllPageNumbers = true
+
+
+	}
+
+	)
+
+
+	</div>
+
+
+	<div>
+		<h2>Types</h2>
+
+		<p>
+			<button class="btn btn-secondary" id="createButton" data-url="@Url.Action("Create", "types")">Add New Types</button>
+
+		</p>
+		<table class="table table-dark table-striped table table-dark table-striped table-bordered border-dark">
+			<tr>
+				<th>
+					Book Type
+				</th>
+				<th></th>
+			</tr>
+
+			@foreach (var types in Model.types)
+			{
+				<tr>
+					<td>
+						@Html.DisplayFor(modelItem => types.name)
+					</td>
+					<td>
+						<button class="btn btn-secondary btn-edit" data-url="@Url.Action("Edit", "types", new { id = types.typeId })">EDIT</button>
+						<button class="btn btn-secondary btn-detail" data-url="@Url.Action("Details", "types", new {  id = types.typeId })">DETAIL</button>
+						<button class="btn btn-secondary btn-delete" data-url="@Url.Action("Delete", "types", new {  id = types.typeId })">DELETE</button>
+					</td>
+				</tr>
+			}
+
+		</table>
+		@Html.PagedListPager(Model.types,
+	page => Url.Action("Monitor",
+	new
+	{
+		pageTypes = page,
+		pageAuthors = Request.QueryString["pageAuthors"],
+		pageBorrows = Request.QueryString["pageBorrows"]
+
+
+	}),
+	new PagedListRenderOptions
+	{
+		UlElementClasses = new[] { "pagination" },
+		LiElementClasses = new[] { "page-item", "mx-4" },
+		
+		LinkToPreviousPageFormat = "Previous",
+		LinkToNextPageFormat = "Next",
+		LinkToFirstPageFormat = "First",
+		LinkToLastPageFormat = "Last",
+		DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+		DisplayLinkToLastPage = PagedListDisplayMode.Always,
+		DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+		DisplayLinkToNextPage = PagedListDisplayMode.Always,
+		Display = PagedListDisplayMode.IfNeeded,
+
+		DisplayEllipsesWhenNotShowingAllPageNumbers = true
+
+
+	}
+
+	)
+	</div>
+
+	<div>
+		<h2>Borrows</h2>
+
+		<p>
+			<button class="btn btn-secondary" id="createButton" data-url="@Url.Action("Create", "borrows")">Newly Borrowed</button>
+
+		</p>
+		<table class="table table-dark table-striped table table-dark table-striped table-bordered border-dark">
+			<tr>
+				<th>
+					Taken Date
+				</th>
+				<th>
+					Brought Date
+				</th>
+				<th>
+					Book Name
+				</th>
+				<th>
+					Student Name
+				</th>
+				<th></th>
+			</tr>
+
+			@foreach (var borrows in Model.borrows)
+			{
+				<tr>
+					<td>
+						@Html.DisplayFor(modelItem => borrows.takenDate)
+					</td>
+					<td>
+						@Html.DisplayFor(modelItem => borrows.broughtDate)
+					</td>
+					<td>
+						@Html.DisplayFor(modelItem => borrows.book.name)
+					</td>
+					<td>
+						@borrows.student.name @borrows.student.surname
+					</td>
+
+					<td>
+						<button class="btn btn-secondary btn-edit" data-url="@Url.Action("Edit", "borrows", new { id = borrows.borrowId })">EDIT</button>
+						<button class="btn btn-secondary btn-detail" data-url="@Url.Action("Details", "borrows", new { id = borrows.borrowId  })">DETAIL</button>
+						<button class="btn btn-secondary btn-delete" data-url="@Url.Action("Delete", "borrows", new {  id = borrows.borrowId })">DELETE</button>
+					</td>
+				</tr>
+			}
+
+		</table>
+		@Html.PagedListPager(Model.borrows,
+	page => Url.Action("Monitor",
+	new
+	{
+		pageBorrows = page,
+		pageTypes = Request.QueryString["pageTypes"],
+		pageAuthors = Request.QueryString["pageAuthors"]
+
+
+	}),
+	new PagedListRenderOptions
+	{
+		UlElementClasses = new[] { "pagination" },
+		LiElementClasses = new[] { "page-item", "mx-4" },
+		
+		LinkToPreviousPageFormat = "Previous",
+		LinkToNextPageFormat = "Next",
+		LinkToFirstPageFormat = "First",
+		LinkToLastPageFormat = "Last",
+		DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+		DisplayLinkToLastPage = PagedListDisplayMode.Always,
+		DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+		DisplayLinkToNextPage = PagedListDisplayMode.Always,
+		Display = PagedListDisplayMode.IfNeeded,
+
+		DisplayEllipsesWhenNotShowingAllPageNumbers = true
+
+
+	}
+
+	)
+	</div>
+	<div id="myModal" class="modal fade" tabindex="-1">
+		<div class="modal-dialog text-dark ">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Monitor</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body" id="modal-content">
+				</div>
+			</div>
+		</div>
+	</div>
+	@section scripts{
+		<script>
+			$(function () {
+				// Function to handle Edit, Detail, and Delete link click events
+				$(document).on("click", ".btn-edit, .btn-detail, .btn-delete, #createButton", function (e) {
+					e.preventDefault();
+					var url = $(this).data("url");
+					console.log(url);
+
+					$.get(url, function (data) {
+						$("#modal-content").empty();
+						$("#modal-content").html(data);
+						$("#myModal").modal("show");
+					});
+				});
+
+				// Function to handle form submission within the modal
+				$("#modal-content").on("submit", "form", function (e) {
+					e.preventDefault();
+					var form = $(this);
+					var url = form.attr("action");
+					var formData = form.serialize();
+
+					$.post(url, formData, function (data) {
+
+						$("#myModal").modal("hide");
+						location.reload();
+					});
+				});
+			});
+		</script>
+	}
+</div>
+	</body>

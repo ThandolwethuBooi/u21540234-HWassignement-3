@@ -1,0 +1,177 @@
+﻿@model u21540234_HWassignement_3.Models.ReportsViewModel
+@{
+	ViewBag.Title = "Report";
+}
+@using PagedList
+@using PagedList.Mvc
+@using Newtonsoft.Json;
+
+<body class="bg-dark text-light">
+	<div>
+		<h2>Borrows</h2>
+
+		<table class="table table-dark table-striped table table-dark table-striped table-bordered border-dark">
+			<thead>
+				<tr>
+					<th>
+						Taken Date
+					</th>
+					<th>
+						Brought Date
+					</th>
+					<th>
+						Book Name
+					</th>
+					<th>
+						Student Name
+					</th>
+					<th></th>
+				</tr>
+			</thead>
+
+			<tbody>
+				@foreach (var borrows in Model.borrows)
+				{
+					<tr>
+						<td>
+							@Html.DisplayFor(modelItem => borrows.takenDate)
+						</td>
+						<td>
+							@Html.DisplayFor(modelItem => borrows.broughtDate)
+						</td>
+						<td>
+							@Html.DisplayFor(modelItem => borrows.book.name)
+						</td>
+						<td>
+							@borrows.student.name @borrows.student.surname
+						</td>
+
+
+					</tr>
+				}
+
+			</tbody>
+
+		</table>
+		@Html.PagedListPager(Model.borrows,
+	page => Url.Action("Monitor",
+	new
+	{
+		pageBorrows = page,
+		pageTypes = Request.QueryString["pageTypes"],
+		pageAuthors = Request.QueryString["pageAuthors"]
+
+
+	}),
+	new PagedListRenderOptions
+	{
+		UlElementClasses = new[] { "pagination" },
+		LiElementClasses = new[] { "page-item", "mx-4" },
+		
+
+		LinkToPreviousPageFormat = "Previous",
+		LinkToNextPageFormat = "Next",
+		LinkToFirstPageFormat = "First",
+		LinkToLastPageFormat = "Last",
+		DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+		DisplayLinkToLastPage = PagedListDisplayMode.Always,
+		DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+		DisplayLinkToNextPage = PagedListDisplayMode.Always,
+		Display = PagedListDisplayMode.IfNeeded,
+
+		DisplayEllipsesWhenNotShowingAllPageNumbers = true
+
+
+	}
+
+	)
+	</div>
+
+
+	<h2>Reports</h2>
+	<button class="page-link btn btn-secondary" id="export">Export</button>
+
+	@{
+		// Group borrowing data by month and calculate borrowing frequency
+		var monthlyBorrowingData = Model.borrows
+			.GroupBy(b => b.takenDate.ToString())
+			.Select(g => new { Month = g.Key, Count = g.Sum(b => 1) }) // Count total borrows per month
+			.OrderBy(x => x.Month)
+			.ToList();
+
+		// Prepare labels and data for the chart
+		var labels = monthlyBorrowingData.Select(x => x.Month).ToList();
+		var data = monthlyBorrowingData.Select(x => x.Count).ToList();
+	}
+
+	<canvas id="borrowingFrequencyChart" width="400" height="200"></canvas>
+
+
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+
+
+    // Get labels and data from Razor variables
+    <script>
+// Get labels and data from Razor variables
+var labels = @Html.Raw(JsonConvert.SerializeObject(labels));
+var chartData = @Html.Raw(JsonConvert.SerializeObject(data));
+
+// Initialize Chart.js
+var ctx = document.getElementById('borrowingFrequencyChart').getContext('2d');
+var borrowingFrequencyChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Number of Books Borrowed',
+            data: chartData,
+            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        animation: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: 'Books Borrowed'
+                }
+            },
+            x: {
+                title: {
+                    display: true,
+                    text: 'Month'
+                }
+            }
+        },
+        plugins: {
+            title: {
+                display: true,
+                text: 'Monthly Borrowing Frequency'
+            }
+        }
+    }
+});
+
+// Export chart as PDF
+document.getElementById("export").addEventListener("click", function () {
+    var barGraphImage = document.getElementById('borrowingFrequencyChart').toDataURL('image/png'); // Convert chart to image
+
+    var contentpdf = {
+        content: [
+            {
+                image: barGraphImage,
+                width: 500
+            }
+        ]
+    };
+    pdfMake.createPdf(contentpdf).open();  // Open the generated PDF
+});
+	</script>
+
+</body>

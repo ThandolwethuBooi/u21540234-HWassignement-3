@@ -1,0 +1,131 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using u21540234_HWassignement_3.Models;
+using PagedList;
+
+namespace u21540234_HWassignement_3.Controllers
+{
+    public class typesController : Controller
+    {
+        private LibraryDBContext db = new LibraryDBContext();
+
+        // GET: types
+        public async Task<ActionResult> Index(int? page)
+        {
+            int pageNumber = page ?? 1;
+            int pageSize = 5;
+            return View((await db.types.ToListAsync()).ToPagedList(pageNumber, pageSize));
+        }
+
+        // GET: types/Details/5
+        public async Task<ActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            type type = await db.types.FindAsync(id);
+            if (type == null)
+            {
+                return HttpNotFound();
+            }
+            return View(type);
+        }
+
+        // GET: types/Create
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: types/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
+        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Create([Bind(Include = "typeId,name")] type type)
+        {
+            if (ModelState.IsValid)
+            {
+                db.types.Add(type);
+                await db.SaveChangesAsync();
+                return RedirectToAction("Index", "Home");
+            }
+
+            return View(type);
+        }
+
+        // GET: types/Edit/5
+        public async Task<ActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            type type = await db.types.FindAsync(id);
+            if (type == null)
+            {
+                return HttpNotFound();
+            }
+            return View(type);
+        }
+
+        // POST: types/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
+        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Edit([Bind(Include = "typeId,name")] type type)
+        {
+            if (ModelState.IsValid)
+            {
+                db.Entry(type).State = EntityState.Modified;
+                await db.SaveChangesAsync();
+                return RedirectToAction("Index", "Home");
+            }
+            return View(type);
+        }
+
+        // GET: types/Delete/5
+        public async Task<ActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            type type = await db.types.FindAsync(id);
+            if (type == null)
+            {
+                return HttpNotFound();
+            }
+            return View(type);
+        }
+
+        // POST: types/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> DeleteConfirmed(int id)
+        {
+            type type = await db.types.FindAsync(id);
+            db.types.Remove(type);
+            await db.SaveChangesAsync();
+            return RedirectToAction("Index", "Home");
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+    }
+}
